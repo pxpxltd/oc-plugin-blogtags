@@ -35,3 +35,6 @@
   - !!! A slug is now created for each tag.
 1.4.1:
   - Turkish translation added (kutups)
+1.4.2:
+  - Tags colours
+  - add_colour_column.php

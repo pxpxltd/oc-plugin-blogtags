@@ -11,3 +11,6 @@ fields:
         type: relation
         nameFrom: title
         emptyOption: No posts available.
+    colour:
+        label: Colour
+        type: colorpicker
