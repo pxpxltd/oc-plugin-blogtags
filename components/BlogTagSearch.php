@@ -53,7 +53,7 @@ class BlogTagSearch extends ComponentBase
      */
     public $lastPage;
 
-     /**
+    /**
      * Reference to the page name for linking to posts.
      * @var string
      */
@@ -84,40 +84,40 @@ class BlogTagSearch extends ComponentBase
     public function defineProperties()
     {
         return [
-            'tag' => [
-                'title'         => 'Tag',
-                'description'   => 'The URL parameter used to search for posts.',
-                'default'       => '{{ :tag }}',
-                'type'          => 'string'
+            'tag'            => [
+                'title'       => 'Tag',
+                'description' => 'The URL parameter used to search for posts.',
+                'default'     => '{{ :tag }}',
+                'type'        => 'string'
             ],
-            'pagination' => [
-                'title'         => 'Paginate results',
-                'description'   => 'Determines if the results are paginated or not.',
-                'type'          => 'checkbox',
+            'pagination'     => [
+                'title'             => 'Paginate results',
+                'description'       => 'Determines if the results are paginated or not.',
+                'type'              => 'checkbox',
                 'showExternalParam' => false
             ],
-            'page' => [
-                'title'         => 'Page',
-                'description'   => 'The URL parameter defining the page number.',
-                'default'       => '{{ :page }}',
-                'type'          => 'string'
+            'page'           => [
+                'title'       => 'Page',
+                'description' => 'The URL parameter defining the page number.',
+                'default'     => '{{ :page }}',
+                'type'        => 'string'
             ],
             'resultsPerPage' => [
-                'title'         => 'Results',
-                'description'   => 'The number of posts to display per page.',
-                'default'       => 10,
-                'type'          => 'string',
+                'title'             => 'Results',
+                'description'       => 'The number of posts to display per page.',
+                'default'           => 10,
+                'type'              => 'string',
                 'validationPattern' => '^(0+)?[1-9]\d*$',
                 'validationMessage' => 'Results per page must be a positive whole number.'
             ],
-            'postPage' => [
+            'postPage'       => [
                 'title'       => 'Post page',
                 'description' => 'Page to show linked posts',
                 'type'        => 'dropdown',
                 'default'     => 'blog/post',
                 'group'       => 'Links',
             ],
-            'categoryPage' => [
+            'categoryPage'   => [
                 'title'       => 'rainlab.blog::lang.settings.posts_category',
                 'description' => 'rainlab.blog::lang.settings.posts_category_description',
                 'type'        => 'dropdown',
@@ -151,15 +151,15 @@ class BlogTagSearch extends ComponentBase
 
         // Query the tag with it's posts
         $this->tag = Tag::where('name', $this->property('tag'))
-            ->orWhere('slug', $this->property('tag'))
-            ->with(['posts' => function($posts) {
-                $posts->skip($this->resultsPerPage * ($this->currentPage - 1))
-                      ->take($this->resultsPerPage);
-            }])
-            ->first();
+                        ->orWhere('slug', $this->property('tag'))
+                        ->with(['posts' => function ($posts) {
+                            $posts->skip($this->resultsPerPage * ($this->currentPage - 1))
+                                  ->take($this->resultsPerPage);
+                        }])
+                        ->first();
 
         // Store the posts in a better container
-        if(empty($this->tag)) {
+        if (empty($this->tag)) {
             $this->posts = null;
             $this->postsOnPage = 0;
         } else {
@@ -167,16 +167,19 @@ class BlogTagSearch extends ComponentBase
             $this->postsOnPage = count($this->posts);
 
             // Add a "url" helper attribute for linking to each post
-            $this->posts->each(function($post) {
-                $post->setUrl($this->postPage,$this->controller);
+            $this->posts->each(function ($post) {
+                $post->setUrl($this->postPage, $this->controller);
 
-                if($post->categories->count()) {
-                    $post->categories->each(function($category){
+                if ($post->categories->count()) {
+                    $post->categories->each(function ($category) {
                         $category->setUrl($this->categoryPage, $this->controller);
                     });
                 }
             });
         }
+        $this->page['blogTag'] = $this->tag;
+        $this->page['blogTagPosts'] = $this->posts;
+
     }
 
 
@@ -196,11 +199,11 @@ class BlogTagSearch extends ComponentBase
     private function calculatePagination()
     {
         // Count the number of posts with this tag
-        $this->totalPosts = Post::whereHas('tags', function($tag) {
-                $tag->where('name', $this->property('tag'))
-                    ->orWhere('slug', $this->property('tag'));
-            })
-            ->count();
+        $this->totalPosts = Post::whereHas('tags', function ($tag) {
+            $tag->where('name', $this->property('tag'))
+                ->orWhere('slug', $this->property('tag'));
+        })
+                                ->count();
 
         // Calculate the results per page
         $this->resultsPerPage = $this->property('pagination')
@@ -211,8 +214,12 @@ class BlogTagSearch extends ComponentBase
         $this->lastPage = ceil($this->totalPosts / $this->resultsPerPage);
 
         // Prevent the current page from being one that doesn't exist
-        if ($this->currentPage < 1) $this->currentPage = 1;
-        if ($this->currentPage > $this->lastPage) $this->currentPage = $this->lastPage;
+        if ($this->currentPage < 1) {
+            $this->currentPage = 1;
+        }
+        if ($this->currentPage > $this->lastPage) {
+            $this->currentPage = $this->lastPage;
+        }
 
         // Calculate the previous page
         $this->previousPage = $this->currentPage > 1
