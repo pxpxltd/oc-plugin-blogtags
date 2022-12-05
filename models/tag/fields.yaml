@@ -5,7 +5,10 @@
 fields:
     name:
         label: Tag
-
+        span: left
+    slug:
+        label: Slug
+        span: right
     posts:
         label: Posts
         type: relation
